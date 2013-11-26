@@ -33,6 +33,32 @@
     return [self _generateDynamicPasscode:counter length:length autoZero:autoZero];
 }
 
+- (NSString *)dynamicPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autofillUp:(NSString *)autofillUp
+{
+    NSMutableString *str = [NSMutableString stringWithString:[self dynamicPasscode:sTime length:length secondMax:secondMax autoZero:NO]];
+    NSMutableString *result = [[[NSMutableString alloc]init] autorelease];
+    
+    do {
+        int len = length -[str length] ;
+        if(len <= 0)
+        {
+            result = str;
+            break;
+        }
+        if([autofillUp length] != 1)
+        {
+            autofillUp = NSDATA_AUTH_OTP_AUTOFILLUP;
+        }
+        while (len --)
+        {
+            [result appendString:autofillUp];
+        }
+        [result appendString:str];
+    } while (0);
+    
+    return result;
+}
+
 - (NSString *)_generateDynamicPasscode:(uint64_t)counter length:(int)length autoZero:(BOOL)autoZero
 {
     CCHmacAlgorithm alg = kCCHmacAlgSHA1;
@@ -50,7 +76,7 @@
     unsigned long truncatedHash = NSSwapBigLongToHost(*((unsigned long *)&ptr[offset])) & 0x7fffffff;
     
     int maxDigits = 1;while (length--)maxDigits*=10;
-
+    
     unsigned long pinValue = truncatedHash % maxDigits;
     
     if(autoZero)
