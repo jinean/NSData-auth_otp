@@ -1,41 +1,42 @@
+//
 //  Created by jinean on 13-11-25.
 //  Copyright (c) 2013年 jinean. All rights reserved.
 //
 
-#import "NSData+auth_otp.h"
+#import "NSData+auth_totp.h"
 
-@implementation NSData (auth_otp)
+@implementation NSData (auth_totp)
 
-- (NSString *)dynamicPasscode
+- (NSString *)dynamicTotpPasscode
 {
-    return [self dynamicPasscode:[NSDate date]];
+    return [self dynamicTotpPasscode:[NSDate date]];
 }
 
-- (NSString *)dynamicPasscode:(NSDate *)sTime
+- (NSString *)dynamicTotpPasscode:(NSDate *)sTime
 {
-    return [self dynamicPasscode:sTime length:NSDATA_AUTH_OTP_LENGTH_DEFAULT];
+    return [self dynamicTotpPasscode:sTime length:NSDATA_AUTH_TOTP_LENGTH_DEFAULT];
 }
 
-- (NSString *)dynamicPasscode:(NSDate *)sTime length:(int)length
+- (NSString *)dynamicTotpPasscode:(NSDate *)sTime length:(int)length
 {
-    return [self dynamicPasscode:sTime length:length secondMax:NSDATA_AUTH_OTP_SECONDMAX_DEFAULT autoZero:YES];
+    return [self dynamicTotpPasscode:sTime length:length secondMax:NSDATA_AUTH_TOTP_SECONDMAX_DEFAULT autoZero:YES];
 }
 
-- (NSString *)dynamicPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax
+- (NSString *)dynamicTotpPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax
 {
-    return [self dynamicPasscode:sTime length:length secondMax:secondMax autoZero:YES];
+    return [self dynamicTotpPasscode:sTime length:length secondMax:secondMax autoZero:YES];
 }
 
-- (NSString *)dynamicPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autoZero:(BOOL)autoZero
+- (NSString *)dynamicTotpPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autoZero:(BOOL)autoZero
 {
     NSTimeInterval seconds = [sTime timeIntervalSince1970];
     uint64_t counter = (uint64_t) (seconds / secondMax);
     return [self _generateDynamicPasscode:counter length:length autoZero:autoZero];
 }
 
-- (NSString *)dynamicPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autofillUp:(NSString *)autofillUp
+- (NSString *)dynamicTotpPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autofillUp:(NSString *)autofillUp
 {
-    NSMutableString *str = [NSMutableString stringWithString:[self dynamicPasscode:sTime length:length secondMax:secondMax autoZero:NO]];
+    NSMutableString *str = [NSMutableString stringWithString:[self dynamicTotpPasscode:sTime length:length secondMax:secondMax autoZero:NO]];
     NSMutableString *result = [[[NSMutableString alloc]init] autorelease];
     
     do {
@@ -47,7 +48,7 @@
         }
         if([autofillUp length] != 1)
         {
-            autofillUp = NSDATA_AUTH_OTP_AUTOFILLUP;
+            autofillUp = NSDATA_AUTH_TOTP_AUTOFILLUP;
         }
         while (len --)
         {
@@ -76,7 +77,7 @@
     unsigned long truncatedHash = NSSwapBigLongToHost(*((unsigned long *)&ptr[offset])) & 0x7fffffff;
     
     int maxDigits = 1;while (length--)maxDigits*=10;
-    
+
     unsigned long pinValue = truncatedHash % maxDigits;
     
     if(autoZero)
