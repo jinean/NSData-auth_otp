@@ -4,6 +4,17 @@
 //
 
 #import "NSData+auth_totp.h"
+#import <CommonCrypto/CommonHMAC.h>
+
+#if __has_feature(objc_arc)
+#define TOTP_AUTORELEASE(exp) exp
+#define TOTP_RELEASE(exp) exp
+#define TOTP_RETAIN(exp) exp
+#else
+#define TOTP_AUTORELEASE(exp) [exp autorelease]
+#define TOTP_RELEASE(exp) [exp release]
+#define TOTP_RETAIN(exp) [exp retain]
+#endif
 
 @implementation NSData (auth_totp)
 
@@ -37,7 +48,7 @@
 - (NSString *)dynamicTotpPasscode:(NSDate *)sTime length:(int)length secondMax:(int)secondMax autofillUp:(NSString *)autofillUp
 {
     NSMutableString *str = [NSMutableString stringWithString:[self dynamicTotpPasscode:sTime length:length secondMax:secondMax autoZero:NO]];
-    NSMutableString *result = [[[NSMutableString alloc]init] autorelease];
+    NSMutableString *result = TOTP_AUTORELEASE([[NSMutableString alloc]init]);
     
     do {
         int len = length -[str length] ;
